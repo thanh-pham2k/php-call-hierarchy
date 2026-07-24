@@ -3,7 +3,18 @@
   "displayName": "PHP Call Hierarchy",
   "description": "Hierarchical call graph viewer (Incoming & Outgoing calls) for PHP in VS Code",
   "version": "0.0.1",
-  "publisher": "php-call-hierarchy",
+  "publisher": "thanh-pham2k",
+  "icon": "icon.png",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "call hierarchy",
+    "call graph",
+    "incoming calls",
+    "outgoing calls",
+    "references",
+    "ast"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/thanh-pham2k/php-call-hierarchy.git"
