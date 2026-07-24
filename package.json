@@ -1,0 +1,166 @@
+{
+  "name": "php-call-hierarchy",
+  "displayName": "PHP Call Hierarchy",
+  "description": "Hierarchical call graph viewer (Incoming & Outgoing calls) for PHP in VS Code",
+  "version": "0.0.1",
+  "publisher": "php-call-hierarchy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thanh-pham2k/php-call-hierarchy.git"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:php",
+    "onCommand:php-call-hierarchy.showIncomingCalls",
+    "onCommand:php-call-hierarchy.showOutgoingCalls",
+    "onCommand:php-call-hierarchy.refresh"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "php-call-hierarchy-container",
+          "title": "PHP Call Hierarchy",
+          "icon": "$(references)"
+        }
+      ]
+    },
+    "views": {
+      "php-call-hierarchy-container": [
+        {
+          "id": "phpCallHierarchyView",
+          "name": "Call Hierarchy"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "phpCallHierarchyExplorerView",
+          "name": "PHP Call Hierarchy"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "php-call-hierarchy.showIncomingCalls",
+        "title": "PHP Call Hierarchy: Show Incoming Calls",
+        "icon": "$(call-incoming)"
+      },
+      {
+        "command": "php-call-hierarchy.showOutgoingCalls",
+        "title": "PHP Call Hierarchy: Show Outgoing Calls",
+        "icon": "$(call-outgoing)"
+      },
+      {
+        "command": "php-call-hierarchy.refresh",
+        "title": "PHP Call Hierarchy: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "php-call-hierarchy.search",
+        "title": "PHP Call Hierarchy: Search Symbol",
+        "icon": "$(search)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "php-call-hierarchy.showIncomingCalls",
+          "when": "editorLangId == php",
+          "group": "navigation@100"
+        },
+        {
+          "command": "php-call-hierarchy.showOutgoingCalls",
+          "when": "editorLangId == php",
+          "group": "navigation@101"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "php-call-hierarchy.showIncomingCalls",
+          "when": "view == phpCallHierarchyView || view == phpCallHierarchyExplorerView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "php-call-hierarchy.showOutgoingCalls",
+          "when": "view == phpCallHierarchyView || view == phpCallHierarchyExplorerView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "php-call-hierarchy.refresh",
+          "when": "view == phpCallHierarchyView || view == phpCallHierarchyExplorerView",
+          "group": "navigation@3"
+        },
+        {
+          "command": "php-call-hierarchy.search",
+          "when": "view == phpCallHierarchyView || view == phpCallHierarchyExplorerView",
+          "group": "navigation@4"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "PHP Call Hierarchy",
+      "properties": {
+        "phpCallHierarchy.maxDepth": {
+          "type": "integer",
+          "default": 5,
+          "description": "Maximum depth for call hierarchy tree expansion"
+        },
+        "phpCallHierarchy.maxResults": {
+          "type": "integer",
+          "default": 50,
+          "description": "Maximum number of child nodes returned per call level"
+        },
+        "phpCallHierarchy.excludePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/vendor/**",
+            "**/node_modules/**",
+            "**/storage/**",
+            "**/cache/**",
+            "**/build/**",
+            "**/dist/**"
+          ],
+          "description": "Glob patterns to exclude from workspace indexing"
+        },
+        "phpCallHierarchy.autoIndexOnStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically index workspace PHP files on extension activation"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "compile": "tsc -p ./",
+    "test": "mocha --require ts-node/register --require ./test/vscodeMock.js 'test/**/*.test.ts'",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.20.0",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2",
+    "php-parser": "^3.1.5"
+  }
+}
