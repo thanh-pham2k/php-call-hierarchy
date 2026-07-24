@@ -7,6 +7,18 @@ A feature-rich VS Code extension built in TypeScript to analyze, construct, and 
 
 ---
 
+### 📥 Direct Download & Quick Install
+
+Download the ready-to-use VS Code extension package:  
+👉 **[Download php-call-hierarchy-0.0.1.vsix](https://github.com/thanh-pham2k/php-call-hierarchy/raw/main/releases/php-call-hierarchy-0.0.1.vsix)**
+
+**How to install in VS Code**:
+1. Open VS Code and press `Ctrl+Shift+X` (Extensions tab).
+2. Click the `...` (More Actions) menu in the top-right corner.
+3. Select **Install from VSIX...** and choose the downloaded `.vsix` file.
+
+---
+
 ## Key Features
 
 ### 1. Hierarchical Call Graph
