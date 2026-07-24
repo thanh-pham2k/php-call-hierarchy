@@ -1,174 +1,193 @@
 # PHP Call Hierarchy (VS Code Extension)
 
-**Extension Display Name**: PHP Call Hierarchy  
+**Extension Display Name**: PHP Call Hierarchy
 **Extension ID**: `php-call-hierarchy`
 
-A feature-rich VS Code extension built in TypeScript to analyze, construct, and present multi-level hierarchical call graphs (**Incoming Calls** & **Outgoing Calls**) for PHP projects in a native VS Code Tree View.
+A feature-rich VS Code extension built in TypeScript to analyze, construct, and present multi-level hierarchical call graphs (**Incoming Calls** and **Outgoing Calls**) for PHP projects in a native VS Code Tree View.
 
 ---
 
 ## Key Features
 
-1. **Hierarchical Call Graph (Multi-level Tree View)**
-   - **Incoming Calls**: Shows all functions/methods calling the active symbol up to configurable depth.
-   - **Outgoing Calls**: Shows all functions/methods called by the active symbol up to configurable depth.
-   - **Expand / Collapse**: Lazy-loads child call hierarchy nodes on demand.
-   - **Navigation**: Single-click any node to jump directly to the target file and exact line number.
+### 1. Hierarchical Call Graph
 
-2. **Full PHP Symbol & Call Support**
-   - Standard functions, instance methods (`$this->method()`, `$object->method()`), and static methods (`ClassName::method()`).
-   - Keyword calls: `self::method()`, `static::method()`, `parent::method()`.
-   - Namespaces and `use` / import aliases (`use Namespace\Class as Alias;`).
-   - Class inheritance (`extends`), interface contracts (`implements`), and traits (`use TraitName;`).
-   - **Cycle / Recursion Detection**: Detects circular call loops (e.g. `A -> B -> A`), flags nodes with `[recursive]` / sync icon, and prevents infinite tree expansion.
+* **Incoming Calls**: Shows functions and methods that call the active symbol, up to a configurable depth.
+* **Outgoing Calls**: Shows functions and methods called by the active symbol, up to a configurable depth.
+* **Expand / Collapse**: Lazy-loads child hierarchy nodes on demand.
+* **Navigation**: Select a node to navigate directly to its file and line number.
 
-3. **High-Performance Architecture**
-   - Pure AST Parsing via `php-parser` (No host PHP binary required).
-   - Off-thread parallel AST parsing using **Node Worker Threads** (`worker_threads`), ensuring VS Code Extension Host remains 100% responsive.
-   - **Incremental Re-indexing**: Listens to file saves and changes, debounced by 300ms, updating only modified `.php` files.
-   - **File Modification Time Caching**: Skips parsing unchanged files based on `mtime`.
-   - **Indexed Call Lookups & Memoization**: Fast O(1) indexed incoming call lookups and memoized descendant resolution.
-   - Default exclusion patterns: `vendor`, `node_modules`, `storage`, `cache`, `build`, `dist`.
+### 2. Full PHP Symbol and Call Support
+
+Supports:
+
+* Standard functions.
+* Instance methods:
+
+  * `$this->method()`
+  * `$object->method()`
+* Static methods:
+
+  * `ClassName::method()`
+* PHP keyword calls:
+
+  * `self::method()`
+  * `static::method()`
+  * `parent::method()`
+* Namespaces and import aliases:
+
+  * `use Namespace\ClassName as Alias;`
+* Class inheritance with `extends`.
+* Interface contracts with `implements`.
+* Traits with `use TraitName;`.
+
+The extension also detects circular call relationships such as:
+
+```text
+A → B → A
+```
+
+Recursive nodes are marked accordingly, and infinite tree expansion is prevented.
+
+### 3. High-Performance Architecture
+
+* Pure AST parsing using `php-parser`.
+* No PHP binary is required on the host machine.
+* Parallel AST parsing using Node.js Worker Threads.
+* Keeps the VS Code Extension Host responsive during indexing.
+* Incremental re-indexing when PHP files are changed or saved.
+* File change handling is debounced to reduce unnecessary indexing.
+* File modification-time caching skips unchanged files.
+* Indexed incoming-call lookups.
+* Memoized descendant resolution for inheritance hierarchies.
+
+Default excluded directories include:
+
+* `vendor`
+* `node_modules`
+* `storage`
+* `cache`
+* `build`
+* `dist`
 
 ---
 
-## Commands & User Interface
+## Commands and User Interface
 
 ### Commands
-- `PHP Call Hierarchy: Show Incoming Calls` (`php-call-hierarchy.showIncomingCalls`)
-- `PHP Call Hierarchy: Show Outgoing Calls` (`php-call-hierarchy.showOutgoingCalls`)
-- `PHP Call Hierarchy: Refresh` (`php-call-hierarchy.refresh`)
-- `PHP Call Hierarchy: Search Symbol` (`php-call-hierarchy.search`)
+
+| Command                                 | Command ID                             |
+| --------------------------------------- | -------------------------------------- |
+| PHP Call Hierarchy: Show Incoming Calls | `php-call-hierarchy.showIncomingCalls` |
+| PHP Call Hierarchy: Show Outgoing Calls | `php-call-hierarchy.showOutgoingCalls` |
+| PHP Call Hierarchy: Refresh             | `php-call-hierarchy.refresh`           |
+| PHP Call Hierarchy: Search Symbol       | `php-call-hierarchy.search`            |
 
 ### UI Integration
-- **Editor Context Menu**: Right-click inside any PHP method/function to trigger incoming/outgoing call views.
-- **Activity Bar View Container**: Dedicated **PHP Call Hierarchy** tab in the sidebar.
-- **Explorer Container View**: Embedded panel in the Explorer sidebar.
-- **View Action Toolbar**: Refresh, switch call directions, search symbols.
+
+* **Editor Context Menu**: Right-click inside a PHP function or method to display its incoming or outgoing calls.
+* **Activity Bar View Container**: Dedicated PHP Call Hierarchy view in the VS Code sidebar.
+* **Explorer Container View**: Call hierarchy panel embedded in the Explorer sidebar.
+* **View Action Toolbar**:
+
+  * Refresh hierarchy.
+  * Switch between incoming and outgoing calls.
+  * Search for PHP symbols.
 
 ---
 
 ## Extension Settings
 
-| Setting | Type | Default | Description |
-|---|---|---|---|
-| `phpCallHierarchy.maxDepth` | `integer` | `5` | Maximum depth for tree expansion |
-| `phpCallHierarchy.maxResults` | `integer` | `50` | Maximum child nodes per level |
-| `phpCallHierarchy.excludePatterns` | `array` | `["**/vendor/**", ...]` | Glob patterns to ignore during workspace indexing |
-| `phpCallHierarchy.autoIndexOnStart` | `boolean` | `true` | Automatically index PHP workspace on activation |
+| Setting                             | Type      | Default                 | Description                                                             |
+| ----------------------------------- | --------- | ----------------------- | ----------------------------------------------------------------------- |
+| `phpCallHierarchy.maxDepth`         | `integer` | `5`                     | Maximum hierarchy expansion depth                                       |
+| `phpCallHierarchy.maxResults`       | `integer` | `50`                    | Maximum number of child nodes displayed per level                       |
+| `phpCallHierarchy.excludePatterns`  | `array`   | `["**/vendor/**", ...]` | Glob patterns excluded from workspace indexing                          |
+| `phpCallHierarchy.autoIndexOnStart` | `boolean` | `true`                  | Automatically indexes the PHP workspace when the extension is activated |
 
 ---
 
-## Installation, Build, Debug & Packaging
+## Installation and Build
 
 ### Prerequisites
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- VS Code >= 1.75.0
 
-### Build & Test Commands
+* Node.js 18.0.0 or later.
+* npm 9.0.0 or later.
+* VS Code 1.75.0 or later.
+
+### Install Dependencies
+
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Build production bundle (esbuild)
-npm run build
-
-# 3. Watch mode for development
-npm run watch
-
-# 4. Run automated test suite
-npm test
-
-# 5. Run real workspace benchmark against C:\laragon\www\TRANS_CREW_SERVER\src\server
-node -r ts-node/register -r ./test/vscodeMock.js test/realWorkspaceTest.ts
 ```
 
-### Packaging VSIX
-To package the extension into a `.vsix` file for installation:
+### Build Production Bundle
+
+```bash
+npm run build
+```
+
+### Development Watch Mode
+
+```bash
+npm run watch
+```
+
+---
+
+## Packaging VSIX
+
+To package the extension into a `.vsix` file:
+
 ```bash
 npx vsce package
 ```
 
-### Debugging in VS Code Extension Development Host
-1. Open this repository folder in VS Code.
+The generated `.vsix` file can be installed manually through VS Code.
+
+---
+
+## Debugging in VS Code
+
+1. Open the repository folder in VS Code.
 2. Press `F5` or select **Run Extension** from the Debug panel.
-3. A new Extension Development Host window will launch with the extension activated.
-4. Open any PHP file, place cursor on a method, right-click and select **PHP Call Hierarchy: Show Incoming Calls**.
+3. A new Extension Development Host window will open.
+4. Open a PHP file.
+5. Place the cursor inside a function or method.
+6. Right-click and select:
+
+   * **PHP Call Hierarchy: Show Incoming Calls**, or
+   * **PHP Call Hierarchy: Show Outgoing Calls**.
 
 ---
 
-## Báo cáo kiểm thử thực tế (Real Workspace Test Report)
+## Limitations
 
-Kiểm thử thực tế trực tiếp với workspace read-only:
-`C:\laragon\www\TRANS_CREW_SERVER\src\server` (Laravel Framework codebase)
+### Dynamic Method Invocation
 
-### 1. Thống kê Workspace & Indexing Metrics
-- **Tổng số file PHP phát hiện** (sau excludePatterns): **891 files**
-- **Thời gian Index ban đầu**: **8,370 ms** (~8.3 giây)
-- **Tổng số Symbols trích xuất**: **8,836 symbols** (classes, interfaces, traits, functions, methods)
-- **Tổng số Method có references**: **7,980 methods**
-- **Mức sử dụng bộ nhớ (Heap Used)**:
-  - Trước index: `110.46 MB`
-  - Sau index: `162.16 MB`
-  - Delta: `51.44 MB`
+Runtime calls based on variable names cannot always be resolved through static AST analysis.
 
-### 2. Chi tiết các Method đã kiểm thử
+Examples:
 
-#### Target 1: `App\Helpers\CommonHelper::getToken`
-- **File**: `app/Helpers/CommonHelper.php:439`
-- **Incoming Calls Count**: 1,642 calls
-- **Outgoing Calls Count**: 2 calls (`$this->...`)
-- **Incoming Call Tree Structure (3 cấp)**:
-  - L1: 50 nodes (e.g. `App\Http\Controllers\Api\AuthController::login`, `App\Http\Middleware\Authenticate::handle`, etc.)
-  - L2: 8 nodes
-  - L3: 3 nodes
-- **Thời gian Expand Tree**: **12 ms** (Incoming), **2 ms** (Outgoing)
+```php
+$functionName();
+$controller->$methodName();
+```
 
-#### Target 2: `App\Helpers\CommonHelper::createMessage`
-- **File**: `app/Helpers/CommonHelper.php:811`
-- **Incoming Calls Count**: 1,581 calls
-- **Outgoing Calls Count**: 2 calls
-- **Incoming Call Tree Structure (3 cấp)**:
-  - L1: 50 nodes
-  - L2: 3 nodes
-  - L3: 6 nodes
-- **Thời gian Expand Tree**: **4 ms** (Incoming), **1 ms** (Outgoing)
+Type hints or PHPDoc annotations may improve symbol resolution in some cases.
 
-#### Target 3: `App\Repositories\TransCrew\BasedRepo::getByQuery`
-- **File**: `app/Repositories/TransCrew/BasedRepo.php:28`
-- **Incoming Calls Count**: 1,104 calls
-- **Outgoing Calls Count**: 4 calls
-- **Incoming Call Tree Structure (3 cấp)**:
-  - L1: 50 nodes
-  - L2: 9 nodes
-  - L3: 6 nodes
-- **Thời gian Expand Tree**: **10 ms** (Incoming), **2 ms** (Outgoing)
+### Magic Methods
 
----
+Calls resolved through the following magic methods may not have a directly identifiable method definition:
 
-### 3. Lỗi đã phát hiện và xử lý thành công (Bugs Fixed)
+```php
+__call()
+__callStatic()
+```
 
-1. **Bị trễ khi tra cứu Incoming Calls trên codebase lớn**:
-   - *Nguyên nhân*: Lặp qua toàn bộ 8,836 symbols để lọc matching targetName.
-   - *Giải pháp*: Thêm chỉ mục `incomingNameMap: Map<string, CallSite[]>` trong `CallGraph`, giúp truy vấn Incoming Calls đạt tốc độ < 10ms.
+The extension may record these calls as call sites without resolving a concrete target definition.
 
-2. **Duyệt cây kế thừa `getDescendants()` tốn chi phí đệ quy**:
-   - *Nguyên nhân*: Duyệt qua toàn bộ danh sách lớp nhiều lần cho mỗi symbol.
-   - *Giải pháp*: Memoization lưu vết `descendantsCache` trong `SymbolResolver`, giúp phản hồi cây kế thừa tức thì.
+### Anonymous Classes and Closures
 
-3. **Nhận diện static / self calls trong AST**:
-   - *Nguyên nhân*: `php-parser` trả về `selfreference` cho node `self::`.
-   - *Giải pháp*: Bổ sung xử lý `selfreference`, `staticreference`, `parentreference` trong `getNodeName()`.
+Calls inside closures are supported.
 
-4. **Đường dẫn Worker Thread script trong môi trường dev vs prod**:
-   - *Nguyên nhân*: `__dirname` khác nhau khi chạy ts-node vs esbuild bundle.
-   - *Giải pháp*: Thêm cơ chế kiểm tra nhiều vị trí file `indexer.worker.js` và fallback mượt mà sang parser chính nếu không tải được worker.
-
----
-
-### 4. Giới hạn & Các trường hợp nâng cao (Limitations)
-
-- **Dynamic Method Invocation**: Các lời gọi động kiểu `$funcName()` hoặc `$controller->$method()` dựa trên biến chuỗi runtime không thể xác định tĩnh qua AST nếu không có type hint / PHPDoc annotations.
-- **Magic Methods (`__call`, `__callStatic`)**: Lời gọi đến các method không được khai báo rõ ràng mà thông qua magic method sẽ được ghi nhận dưới dạng call site nhưng không có định nghĩa trực tiếp.
-- **Anonymous Classes & Closures**: Đã hỗ trợ trích xuất lời gọi bên trong closure, nhưng class ẩn danh chưa gán FQCN cố định.
+Anonymous classes do not always have a stable fully qualified class name, which may limit symbol resolution and hierarchy navigation.
